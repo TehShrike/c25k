@@ -1,0 +1,22 @@
+{
+  "name": "c25k",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify index.js -o build.js",
+    "build": "browserify index.js -o build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "WTFPL",
+  "devDependencies": {
+    "browserify": "13.0.1"
+  },
+  "dependencies": {
+    "abstract-state-router": "5.12.5",
+    "ractive": "0.7.3",
+    "ractive-state-router": "6.1.2"
+  }
+}

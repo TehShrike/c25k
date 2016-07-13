@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<title>
+			C25K
+		</title>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="colors.min.css" type="text/css">
+		<style>
+			.day-button {
+				height: 3em;
+				padding: .5em;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app-content">
+
+		</div>
+
+		<script id='day-selection' type='text/ractive'>
+			<div>
+				{{#allPlans:weekNumber}}
+				<div class="week-list">
+					<ol>
+					{{#.:dayNumber}}
+						<li class="day-button bg-orange">
+							<a href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">Week #{{weekNumber}} day {{dayNumber}}</a>
+						</li>
+					{{/}}
+					</ol>
+				</div>
+				{{/}}
+			</div>
+		</script>
+
+		<script id='timer' type='text/ractive'>
+			<h1>Timer page {{parameters.week}} {{parameters.day}}</h1>
+			<ol>
+				{{#plan}}
+					<li>
+						Do {{action}} for {{seconds}}
+					</li>
+				{{/}}
+			</ol>
+		</script>
+	</body>
+	<script src="build.js"></script>
+</html>
