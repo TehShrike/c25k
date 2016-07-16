@@ -9,9 +9,28 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="colors.min.css" type="text/css">
 		<style>
-			.day-button {
-				height: 3em;
+			body {
+				font-family: sans-serif;
+			}
+			.week-list {
 				padding: .5em;
+			}
+			.day-list {
+				padding: 0;
+			}
+			.day-button {
+				list-style-type: none;
+				border-width: 2px;
+				border-style: solid;
+				margin: 1em;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				text-align: center;
+			}
+			.day-button a {
+				font-size: 2em;
+				height: 100%;
+				width: 100%;
 			}
 		</style>
 	</head>
@@ -24,10 +43,12 @@
 			<div>
 				{{#allPlans:weekNumber}}
 				<div class="week-list">
-					<ol>
+					<ol class="day-list">
 					{{#.:dayNumber}}
-						<li class="day-button bg-orange">
-							<a href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">Week #{{weekNumber}} day {{dayNumber}}</a>
+						<li class="day-button border--orange">
+							<a class="navy" href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
+								Week {{weekNumber}} -- day {{dayNumber}}
+							</a>
 						</li>
 					{{/}}
 					</ol>
