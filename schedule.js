@@ -15,7 +15,7 @@ function cooldown(seconds) {
 }
 
 const firstWeek = [
-	warmup(5 * 60),
+	warmup(.05 * 60),
 	jog(60), walk(60),
 	jog(60), walk(60),
 	jog(60), walk(60),

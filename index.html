@@ -11,7 +11,12 @@
 		<style>
 			body {
 				font-family: sans-serif;
+				padding: 0;
+				margin: 0;
 			}
+
+
+
 			.week-list {
 				padding: .5em;
 			}
@@ -32,6 +37,22 @@
 				height: 100%;
 				width: 100%;
 			}
+
+
+			.timer-page {
+				height: 100%;
+				padding: 0;
+				margin: 0;
+
+				text-align: center;
+			}
+			.percentage {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				z-index: -1;
+			}
 		</style>
 	</head>
 	<body>
@@ -47,7 +68,7 @@
 					{{#.:dayNumber}}
 						<li class="day-button border--orange">
 							<a class="navy" href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
-								Week {{weekNumber}} -- day {{dayNumber}}
+								Week {{weekNumber + 1}} -- day {{dayNumber + 1}}
 							</a>
 						</li>
 					{{/}}
@@ -58,14 +79,11 @@
 		</script>
 
 		<script id='timer' type='text/ractive'>
-			<h1>Timer page {{parameters.week}} {{parameters.day}}</h1>
-			<ol>
-				{{#plan}}
-					<li>
-						Do {{action}} for {{seconds}}
-					</li>
-				{{/}}
-			</ol>
+			<div class="timer-page">
+				<h1>computer says {{currentPlan.action.toUpperCase()}}</h1>
+				<h2>for {{currentPlan.seconds / 60}} minutes</h2>
+				<div class="percentage bg-{{color}}" style="height: {{percentage}}%"></div>
+			</div>
 		</script>
 	</body>
 	<script src="build.js"></script>
