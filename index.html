@@ -37,18 +37,14 @@
 				padding: 0;
 			}
 			.day-button {
-				list-style-type: none;
 				border-width: 2px;
 				border-style: solid;
 				margin: 1em;
 				padding-top: 1em;
 				padding-bottom: 1em;
-				text-align: center;
-			}
-			.day-button a {
 				font-size: 2em;
-				height: 100%;
-				width: 100%;
+				text-align: center;
+				text-decoration: none;
 			}
 
 
@@ -76,16 +72,17 @@
 		<script id='day-selection' type='text/ractive'>
 			<div class="reset">
 				{{#allPlans:weekNumber}}
-				<div class="week-list">
-					<ol class="day-list horizontal-container">
+				<div class="week-list"
+				style="height: 30%">
+					<div class="day-list horizontal-container">
 					{{#.:dayNumber}}
-						<li class="day-button border--teal horizontal-child rounded bg-aqua">
-							<a class="red" href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
-								Week {{weekNumber + 1}} — day {{dayNumber + 1}}
-							</a>
-						</li>
+						<a
+						class="day-button black border--teal horizontal-child rounded bg-aqua"
+						href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
+							Week {{weekNumber + 1}} — day {{dayNumber + 1}}
+						</a>
 					{{/}}
-					</ol>
+					</div>
 				</div>
 				{{/}}
 			</div>
