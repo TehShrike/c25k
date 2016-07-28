@@ -11,6 +11,7 @@
 		<style>
 			body {
 				font-family: sans-serif;
+				text-align: center;
 			}
 
 			.horizontal-container {
@@ -19,6 +20,7 @@
 			.horizontal-child {
 				flex-grow: 1;
 			}
+
 			.rounded {
 				-webkit-border-radius: 5px;
 				-moz-border-radius: 5px;
@@ -30,31 +32,17 @@
 				margin: 0;
 			}
 
-			.week-list {
-				padding: .5em;
-			}
-			.day-list {
-				padding: 0;
-			}
 			.day-button {
 				border-width: 2px;
 				border-style: solid;
 				margin: 1em;
-				padding-top: 1em;
-				padding-bottom: 1em;
+				padding-top: 2em;
+				padding-bottom: 2em;
 				font-size: 2em;
-				text-align: center;
 				text-decoration: none;
 			}
 
 
-			.timer-page {
-				height: 100%;
-				padding: 0;
-				margin: 0;
-
-				text-align: center;
-			}
 			.percentage {
 				position: absolute;
 				top: 0;
@@ -72,9 +60,8 @@
 		<script id='day-selection' type='text/ractive'>
 			<div class="reset">
 				{{#allPlans:weekNumber}}
-				<div class="week-list"
-				style="height: 30%">
-					<div class="day-list horizontal-container">
+				<div>
+					<div class="horizontal-container">
 					{{#.:dayNumber}}
 						<a
 						class="day-button black border--teal horizontal-child rounded bg-aqua"
@@ -89,7 +76,7 @@
 		</script>
 
 		<script id='timer' type='text/ractive'>
-			<div class="timer-page">
+			<div class="reset" style="height: 100%">
 				<h1>computer says {{currentPlan.action.toUpperCase()}}</h1>
 				<h2>for {{currentPlan.seconds / 60}} minutes</h2>
 				<div class="percentage bg-{{color}}" style="height: {{percentage}}%"></div>
