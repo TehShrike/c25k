@@ -49,36 +49,53 @@ stateRouter.addState({
 		})
 	},
 	activate: function(context) {
-		let startOfStep = performance.now()
 		const ractive = context.domApi
 
-		const interval = setInterval(debounceToNextFrame(() => {
+		function incrementStep() {
+			ractive.set({
+				currentStep: ractive.get('currentStep') + 1,
+				secondsThisStep: 0
+			})
+		}
+
+		const clear = tickSeconds(100, debounceToNextFrame((seconds, resetClock) => {
 			const doneWithThisStep = ractive.get('secondsThisStep') >= ractive.get('currentPlan').seconds
 			if (doneWithThisStep) {
-				startOfStep = performance.now()
-				ractive.set({
-					currentStep: ractive.get('currentStep') + 1,
-					secondsThisStep: 0
-				})
+				incrementStep()
+				resetClock()
 			} else {
-				const newSeconds = (performance.now() - startOfStep) / 1000
 				ractive.set({
-					secondsThisStep: newSeconds
+					secondsThisStep: seconds
 				})
 			}
-		}), 100)
-		context.on('destroy', () => clearInterval(interval))
+		}))
+
+		context.on('destroy', clear)
 	}
 })
 
+function tickSeconds(frequency, tickCb) {
+	let started
+
+	function resetClock() {
+		started = performance.now()
+	}
+
+	const interval = setInterval(() => tickCb((performance.now() - started) / 1000, resetClock), frequency)
+
+	resetClock()
+
+	return () => clearInterval(interval)
+}
+
 function debounceToNextFrame(fn) {
 	let happening = false
-	return function() {
+	return function(...args) {
 		if (!happening) {
 			happening = true
 			window.requestAnimationFrame(() => {
 				happening = false
-				fn()
+				fn.apply(null, args)
 			})
 		}
 	}
