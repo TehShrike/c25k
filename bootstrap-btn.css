@@ -1,0 +1,40 @@
+.btn {
+    border-width: 2px;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 10px 15px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.btn:hover, .btn:focus, .btn.focus {
+    text-decoration: none;
+}
+
+.btn-lg {
+    padding: 18px 27px;
+    font-size: 19px;
+    line-height: 1.3333333;
+    border-radius: 6px;
+}
+
+.btn-xl {
+    padding: 50px 25%;
+    font-size: 4em;
+    line-height: 1.3333333;
+    border-radius: 6px;
+}

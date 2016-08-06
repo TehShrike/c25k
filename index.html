@@ -8,6 +8,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="colors.min.css" type="text/css">
+		<link rel="stylesheet" href="colors-hover.css" type="text/css">
+		<link rel="stylesheet" href="bootstrap-btn.css" type="text/css">
 		<style>
 			body {
 				font-family: sans-serif;
@@ -64,9 +66,17 @@
 					<div class="horizontal-container">
 					{{#.:dayNumber}}
 						<a
-						class="day-button black border--teal horizontal-child rounded bg-aqua"
+						class="day-button black border-aqua hover-border-teal
+						{{model.getDay(weekNumber, dayNumber) ? 'bg-lime' : 'bg-aqua'}}
+						horizontal-child rounded"
 						href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
 							Week {{weekNumber + 1}} — day {{dayNumber + 1}}
+							{{#model.getDay(weekNumber, dayNumber)}}
+								<br>COMPLETED!
+								<br>{{dayName(model.getDay(weekNumber, dayNumber))}},
+								{{monthName(model.getDay(weekNumber, dayNumber))}}
+								{{model.getDay(weekNumber, dayNumber).getDate()}}
+							{{/}}
 						</a>
 					{{/}}
 					</div>
@@ -75,10 +85,34 @@
 			</div>
 		</script>
 
+		<script id='congrats' type='text/ractive'>
+			<div class="reset olive">
+				<h1>Congratulations!</h1>
+				<h2>You are an awesome person who is a winner.</h2>
+			</div>
+		</script>
+
 		<script id='timer' type='text/ractive'>
 			<div class="reset" style="height: 100%">
 				<h1>computer says {{currentPlan.action.toUpperCase()}}</h1>
 				<h2>for {{currentPlan.seconds / 60}} minutes</h2>
+				<div style="position:absolute; top: 60%; width: 100%">
+					{{#if currentPlan.action === 'cooldown'}}
+						<button on-click="done"
+						class="btn btn-xl
+						black bg-green border--green
+						hover-bg-yellow hover-border-lime">
+							Done
+						</button>
+					{{else}}
+						<button on-click="cancel"
+						class="btn btn-lg
+						black bg-yellow border--yellow
+						hover-bg-red hover-border-olive">
+							Cancel
+						</button>
+					{{/if}}
+				</div>
 				<div class="percentage bg-{{color}}" style="height: {{percentage}}%"></div>
 			</div>
 		</script>

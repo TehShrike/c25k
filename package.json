@@ -24,6 +24,7 @@
   "dependencies": {
     "abstract-state-router": "5.12.5",
     "ractive": "0.7.3",
-    "ractive-state-router": "6.1.2"
+    "ractive-state-router": "6.1.2",
+    "xtend": "4.0.1"
   }
 }
