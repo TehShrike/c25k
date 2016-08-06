@@ -18935,7 +18935,7 @@ function cooldown(seconds) {
 	return time('cooldown', seconds);
 }
 
-var firstWeek = [warmup(.05 * 60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), cooldown(5 * 60)];
+var firstWeek = [warmup(5 * 60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), cooldown(5 * 60)];
 var secondWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), cooldown(4 * 60)];
 var thirdWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), cooldown(5 * 60)];
 var fourthWeek = [warmup(5 * 60), jog(5 * 60), walk(90), jog(5 * 60), walk(150), jog(3 * 60), walk(90), jog(5 * 60), cooldown(3 * 60 + 30)];
