@@ -67,8 +67,9 @@
 					<div class="horizontal-container">
 					{{#.:dayNumber}}
 						<a
-						class="day-button black border-aqua hover-border-teal
+						class="day-button black hover-border-teal
 						{{model.getDay(weekNumber, dayNumber) ? 'bg-lime' : 'bg-aqua'}}
+						{{isNextDay(weekNumber, dayNumber) ? 'border--red' : 'border--gray' }}
 						horizontal-child rounded"
 						href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
 							Week {{weekNumber + 1}} — day {{dayNumber + 1}}

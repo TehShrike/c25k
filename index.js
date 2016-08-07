@@ -4,6 +4,7 @@ const abstractStateRouter = require('abstract-state-router')
 const ractiveStateRenderer = ractiveStateRouter(require('ractive'))
 const stateRouter = abstractStateRouter(ractiveStateRenderer, '#app-content')
 const model = require('./model')
+const { getNextDayFromModel } = require('./date-modification')
 
 function dayName(date) {
 	const day = date.getDay()
@@ -28,11 +29,17 @@ stateRouter.addState({
 	template: '#day-selection',
 	route: '/select',
 	resolve: function(data, params, cb) {
+		const modelData = model.load()
 		cb(null, {
 			allPlans: weeks,
-			model: model.load(),
+			model: modelData,
 			monthName,
-			dayName
+			dayName,
+			isNextDay: function isNextDay(week, day) {
+				const nextDay = getNextDayFromModel(modelData)
+
+				return nextDay.week == week && nextDay.day == day
+			}
 		})
 	}
 })
