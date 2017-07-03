@@ -1,24 +1,31 @@
-const extend = require('xtend')
-
 const KEY = 'C25K'
+const START_TIMESTAMP_KEY = 'C25K_START'
+
+const extend = (...args) => Object.assign({}, ...args)
 
 module.exports = {
 	load: function load() {
 		return addMethods(loadFromLocalstorage())
 	},
-	storeDay: function({week, day, date}) {
+	storeDay: function({ week, day, date }) {
 		return setDay({ model: loadFromLocalstorage(), week, day, date })
+	},
+	storeStartTimestamp(startTimestamp) {
+		saveJson(START_TIMESTAMP_KEY, startTimestamp)
+	},
+	loadStartTimestamp() {
+		return loadJson(START_TIMESTAMP_KEY)
 	}
 }
 
-function loadFromLocalstorage() {
-	const fromStorage = localStorage.getItem(KEY)
-
-	return fromStorage ? JSON.parse(fromStorage) : {}
+const loadJson = key => {
+	const json = localStorage.getItem(key)
+	return json && JSON.parse(json)
 }
+const saveJson = (key, value) => localStorage.setItem(key, JSON.stringify(value))
 
-function store(model) {
-	localStorage.setItem(KEY, JSON.stringify(model))
+function loadFromLocalstorage() {
+	return loadJson(KEY) || {}
 }
 
 function addMethods(model) {
@@ -36,14 +43,14 @@ function getDay(model, week, day) {
 	return timestamp ? new Date(timestamp) : null
 }
 
-function setDay({model, week, day, date}) {
+function setDay({ model, week, day, date }) {
 	const newModel = extend(model, {
 		[week]: extend(model[week], {
 			[day]: date.valueOf()
 		})
 	})
 
-	store(newModel)
+	saveJson(KEY, newModel)
 
 	return addMethods(newModel)
 }

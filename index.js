@@ -4,17 +4,18 @@ const abstractStateRouter = require('abstract-state-router')
 const ractiveStateRenderer = ractiveStateRouter(require('ractive'))
 const stateRouter = abstractStateRouter(ractiveStateRenderer, '#app-content')
 const model = require('./model')
+const deriveStepFromPlan = require('./derive-step-from-plan')
 const { getNextDayFromModel } = require('./date-modification')
 
 function dayName(date) {
 	const day = date.getDay()
-	return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day]
+	return [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ][day]
 }
 
 function monthName(date) {
 	const month = date.getMonth()
-	return ['January', 'February', 'March', 'April', 'May', 'June', 'July',
-		'August', 'September', 'October', 'November', 'December'][month]
+	return [ 'January', 'February', 'March', 'April', 'May', 'June', 'July',
+		'August', 'September', 'October', 'November', 'December' ][month]
 }
 
 const colors = {
@@ -23,6 +24,8 @@ const colors = {
 	warmup: 'olive',
 	jog: 'orange'
 }
+
+const defaultRunState = { currentStep: 0, secondsThisStep: 0 }
 
 stateRouter.addState({
 	name: 'day-selection',
@@ -62,15 +65,35 @@ stateRouter.addState({
 	},
 	route: '/timer/:week(\\d+)/:day(\\d+)',
 	resolve: function(data, params, cb) {
+		const plan = weeks[params.week][params.day]
+		const startTimestampFromStorage = model.loadStartTimestamp() || null
+		const now = Date.now()
+
+		let startTimestamp
+		if (startTimestampFromStorage) {
+			startTimestamp = startTimestampFromStorage
+		} else {
+			startTimestamp = now
+			model.storeStartTimestamp(startTimestamp)
+		}
+
+		const elapsedAtStart = now - startTimestamp
+		const derivedRunState = startTimestampFromStorage
+			? deriveStepFromPlan(elapsedAtStart, plan)
+			: null
+
+		const { currentStep, secondsThisStep } = derivedRunState || defaultRunState
+
 		cb(null, {
-			plan: weeks[params.week][params.day],
 			parameters: params,
-			currentStep: 0,
-			secondsThisStep: 0
+			plan,
+			currentStep,
+			secondsThisStep,
 		})
 	},
 	activate: function(context) {
 		const { domApi: ractive, parameters } = context
+		const { secondsThisStep: elapsedAtStart } = context.content
 
 		// if I start at 23:45 and finish at 00:15, it counts as being the day before
 		const runDate = new Date()
@@ -89,7 +112,7 @@ stateRouter.addState({
 			}
 		}
 
-		const clear = timerTick(100, debounceToNextFrame((seconds, resetClock) => {
+		const clear = timerTick(100, elapsedAtStart * 1000, debounceToNextFrame((seconds, resetClock) => {
 			const doneWithThisStep = ractive.get('secondsThisStep') >= ractive.get('currentPlan').seconds
 			if (doneWithThisStep) {
 				incrementStep()
@@ -101,7 +124,10 @@ stateRouter.addState({
 			}
 		}))
 
-		ractive.on('cancel', () => stateRouter.go('day-selection'))
+		ractive.on('cancel', () => {
+			model.storeStartTimestamp(null)
+			stateRouter.go('day-selection')
+		})
 
 		ractive.on('done', () => {
 			model.storeDay({
@@ -109,6 +135,7 @@ stateRouter.addState({
 				day: parameters.day,
 				date: runDate
 			})
+			model.storeStartTimestamp(null)
 			stateRouter.go('congrats')
 		})
 
@@ -130,16 +157,16 @@ stateRouter.addState({
 })
 
 
-function timerTick(frequency, tickCb) {
-	let started
+function timerTick(frequency, offsetForFirstStep, tickCb) {
+	let started = performance.now()
 
-	function resetClock() {
+	const getElapsed = () => performance.now() - started + offsetForFirstStep
+	const resetClock = () => {
 		started = performance.now()
+		offsetForFirstStep = 0
 	}
 
-	const interval = setInterval(() => tickCb((performance.now() - started) / 1000, resetClock), frequency)
-
-	resetClock()
+	const interval = setInterval(() => tickCb(getElapsed() / 1000, resetClock), frequency)
 
 	return () => clearInterval(interval)
 }

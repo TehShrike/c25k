@@ -110,13 +110,13 @@ const ninthWeek = [
 ]
 
 module.exports = [
-	[firstWeek, firstWeek, firstWeek],
-	[secondWeek, secondWeek, secondWeek],
-	[thirdWeek, thirdWeek, thirdWeek],
-	[fourthWeek, fourthWeek, fourthWeek],
-	[fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree],
-	[sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree],
-	[seventhWeek, seventhWeek, seventhWeek],
-	[eightWeek, eightWeek, eightWeek],
-	[ninthWeek, ninthWeek, ninthWeek]
+	[ firstWeek, firstWeek, firstWeek ],
+	[ secondWeek, secondWeek, secondWeek ],
+	[ thirdWeek, thirdWeek, thirdWeek ],
+	[ fourthWeek, fourthWeek, fourthWeek ],
+	[ fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree ],
+	[ sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree ],
+	[ seventhWeek, seventhWeek, seventhWeek ],
+	[ eightWeek, eightWeek, eightWeek ],
+	[ ninthWeek, ninthWeek, ninthWeek ]
 ]
