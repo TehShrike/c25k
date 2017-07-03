@@ -28,7 +28,39 @@ function increment(_ref) {
 	return day === 2 ? { week: week + 1, day: 0 } : { week: week, day: day + 1 };
 }
 
-},{"just-flatten":18}],2:[function(require,module,exports){
+},{"just-flatten":19}],2:[function(require,module,exports){
+"use strict";
+
+function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+
+module.exports = function deriveStepFromPlan(elapsedMs, plan) {
+	var step = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+
+	if (plan.length === 0) {
+		return null;
+	}
+
+	var _plan = _toArray(plan);
+
+	var nextStep = _plan[0];
+
+	var restOfPlan = _plan.slice(1);
+
+	var nextIncrementMs = nextStep.seconds * 1000;
+	var timeLeftMs = elapsedMs - nextIncrementMs;
+
+	if (timeLeftMs > 0) {
+		return deriveStepFromPlan(timeLeftMs, restOfPlan, step + 1);
+	}
+
+	var timeLeftSeconds = timeLeftMs / -1000;
+	return {
+		currentStep: step,
+		secondsThisStep: nextStep.seconds - timeLeftSeconds
+	};
+};
+
+},{}],3:[function(require,module,exports){
 'use strict';
 
 var weeks = require('./schedule');
@@ -37,6 +69,7 @@ var abstractStateRouter = require('abstract-state-router');
 var ractiveStateRenderer = ractiveStateRouter(require('ractive'));
 var stateRouter = abstractStateRouter(ractiveStateRenderer, '#app-content');
 var model = require('./model');
+var deriveStepFromPlan = require('./derive-step-from-plan');
 
 var _require = require('./date-modification');
 
@@ -59,6 +92,8 @@ var colors = {
 	warmup: 'olive',
 	jog: 'orange'
 };
+
+var defaultRunState = { currentStep: 0, secondsThisStep: 0 };
 
 stateRouter.addState({
 	name: 'day-selection',
@@ -98,16 +133,38 @@ stateRouter.addState({
 	},
 	route: '/timer/:week(\\d+)/:day(\\d+)',
 	resolve: function resolve(data, params, cb) {
+		var plan = weeks[params.week][params.day];
+		var startTimestampFromStorage = model.loadStartTimestamp() || null;
+		var now = Date.now();
+
+		var startTimestamp = void 0;
+		if (startTimestampFromStorage) {
+			startTimestamp = startTimestampFromStorage;
+		} else {
+			startTimestamp = now;
+			model.storeStartTimestamp(startTimestamp);
+		}
+
+		var elapsedAtStart = now - startTimestamp;
+		var derivedRunState = startTimestampFromStorage ? deriveStepFromPlan(elapsedAtStart, plan) : null;
+
+		var _ref = derivedRunState || defaultRunState;
+
+		var currentStep = _ref.currentStep;
+		var secondsThisStep = _ref.secondsThisStep;
+
+
 		cb(null, {
-			plan: weeks[params.week][params.day],
 			parameters: params,
-			currentStep: 0,
-			secondsThisStep: 0
+			plan: plan,
+			currentStep: currentStep,
+			secondsThisStep: secondsThisStep
 		});
 	},
 	activate: function activate(context) {
 		var ractive = context.domApi;
 		var parameters = context.parameters;
+		var elapsedAtStart = context.content.secondsThisStep;
 
 		// if I start at 23:45 and finish at 00:15, it counts as being the day before
 
@@ -127,7 +184,7 @@ stateRouter.addState({
 			}
 		}
 
-		var clear = timerTick(100, debounceToNextFrame(function (seconds, resetClock) {
+		var clear = timerTick(100, elapsedAtStart * 1000, debounceToNextFrame(function (seconds, resetClock) {
 			var doneWithThisStep = ractive.get('secondsThisStep') >= ractive.get('currentPlan').seconds;
 			if (doneWithThisStep) {
 				incrementStep();
@@ -140,7 +197,8 @@ stateRouter.addState({
 		}));
 
 		ractive.on('cancel', function () {
-			return stateRouter.go('day-selection');
+			model.storeStartTimestamp(null);
+			stateRouter.go('day-selection');
 		});
 
 		ractive.on('done', function () {
@@ -149,6 +207,7 @@ stateRouter.addState({
 				day: parameters.day,
 				date: runDate
 			});
+			model.storeStartTimestamp(null);
 			stateRouter.go('congrats');
 		});
 
@@ -171,18 +230,20 @@ stateRouter.addState({
 	}
 });
 
-function timerTick(frequency, tickCb) {
-	var started = void 0;
+function timerTick(frequency, offsetForFirstStep, tickCb) {
+	var started = performance.now();
 
-	function resetClock() {
+	var getElapsed = function getElapsed() {
+		return performance.now() - started + offsetForFirstStep;
+	};
+	var resetClock = function resetClock() {
 		started = performance.now();
-	}
+		offsetForFirstStep = 0;
+	};
 
 	var interval = setInterval(function () {
-		return tickCb((performance.now() - started) / 1000, resetClock);
+		return tickCb(getElapsed() / 1000, resetClock);
 	}, frequency);
-
-	resetClock();
 
 	return function () {
 		return clearInterval(interval);
@@ -208,14 +269,21 @@ function debounceToNextFrame(fn) {
 
 stateRouter.evaluateCurrentRoute('day-selection');
 
-},{"./date-modification":1,"./model":3,"./schedule":32,"abstract-state-router":5,"ractive":29,"ractive-state-router":28}],3:[function(require,module,exports){
+},{"./date-modification":1,"./derive-step-from-plan":2,"./model":4,"./schedule":36,"abstract-state-router":6,"ractive":32,"ractive-state-router":31}],4:[function(require,module,exports){
 'use strict';
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var extend = require('xtend');
-
 var KEY = 'C25K';
+var START_TIMESTAMP_KEY = 'C25K_START';
+
+var extend = function extend() {
+	for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+		args[_key] = arguments[_key];
+	}
+
+	return Object.assign.apply(Object, [{}].concat(args));
+};
 
 module.exports = {
 	load: function load() {
@@ -227,17 +295,25 @@ module.exports = {
 		var date = _ref.date;
 
 		return setDay({ model: loadFromLocalstorage(), week: week, day: day, date: date });
+	},
+	storeStartTimestamp: function storeStartTimestamp(startTimestamp) {
+		saveJson(START_TIMESTAMP_KEY, startTimestamp);
+	},
+	loadStartTimestamp: function loadStartTimestamp() {
+		return loadJson(START_TIMESTAMP_KEY);
 	}
 };
 
+var loadJson = function loadJson(key) {
+	var json = localStorage.getItem(key);
+	return json && JSON.parse(json);
+};
+var saveJson = function saveJson(key, value) {
+	return localStorage.setItem(key, JSON.stringify(value));
+};
+
 function loadFromLocalstorage() {
-	var fromStorage = localStorage.getItem(KEY);
-
-	return fromStorage ? JSON.parse(fromStorage) : {};
-}
-
-function store(model) {
-	localStorage.setItem(KEY, JSON.stringify(model));
+	return loadJson(KEY) || {};
 }
 
 function addMethods(model) {
@@ -263,14 +339,14 @@ function setDay(_ref2) {
 
 	var newModel = extend(model, _defineProperty({}, week, extend(model[week], _defineProperty({}, day, date.valueOf()))));
 
-	store(newModel);
+	saveJson(KEY, newModel);
 
 	return addMethods(newModel);
 }
 
-},{"xtend":31}],4:[function(require,module,exports){
-module.exports = { reverse: false }
 },{}],5:[function(require,module,exports){
+module.exports = { reverse: false }
+},{}],6:[function(require,module,exports){
 (function (process){
 var StateState = require('./lib/state-state')
 var StateComparison = require('./lib/state-comparison')
@@ -701,7 +777,7 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./default-router-options.js":4,"./lib/current-state":6,"./lib/promise-map-series":7,"./lib/state-change-logic":8,"./lib/state-comparison":9,"./lib/state-state":10,"./lib/state-string-parser":11,"./lib/state-transition-manager":12,"_process":24,"combine-arrays":14,"events":15,"hash-brown-router":17,"native-promise-only/npo":19,"page-path-builder":20,"then-denodeify":30,"xtend":31}],6:[function(require,module,exports){
+},{"./default-router-options.js":5,"./lib/current-state":7,"./lib/promise-map-series":8,"./lib/state-change-logic":9,"./lib/state-comparison":10,"./lib/state-state":11,"./lib/state-string-parser":12,"./lib/state-transition-manager":13,"_process":26,"combine-arrays":15,"events":16,"hash-brown-router":18,"native-promise-only/npo":20,"page-path-builder":22,"then-denodeify":34,"xtend":35}],7:[function(require,module,exports){
 module.exports = function CurrentState() {
 	var current = {
 		name: '',
@@ -721,7 +797,7 @@ module.exports = function CurrentState() {
 	}
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // Pulled from https://github.com/joliss/promise-map-series and prettied up a bit
 
 var Promise = require('native-promise-only/npo')
@@ -739,7 +815,7 @@ module.exports = function sequence(array, iterator, thisArg) {
 	return Promise.all(results)
 }
 
-},{"native-promise-only/npo":19}],8:[function(require,module,exports){
+},{"native-promise-only/npo":20}],9:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -770,7 +846,7 @@ module.exports = function stateChangeLogic(stateComparisonResults) {
 	return output
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var combine = require('combine-arrays')
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
@@ -827,7 +903,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":11,"combine-arrays":14,"path-to-regexp-with-reversible-keys":22}],10:[function(require,module,exports){
+},{"./state-string-parser":12,"combine-arrays":15,"path-to-regexp-with-reversible-keys":24}],11:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -917,7 +993,7 @@ module.exports = function StateState() {
 	}
 }
 
-},{"./state-string-parser":11}],11:[function(require,module,exports){
+},{"./state-string-parser":12}],12:[function(require,module,exports){
 module.exports = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
 		if (stateNames.length) {
@@ -928,7 +1004,7 @@ module.exports = function(stateString) {
 	}, [])
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = function (emitter) {
 	var currentTransitionAttempt = null
 	var nextTransition = null
@@ -983,7 +1059,7 @@ module.exports = function (emitter) {
 	}
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1018,7 +1094,7 @@ module.exports = function (emitter) {
   }
 })(this);
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = function(obj) {
 	var keys = Object.keys(obj)
 
@@ -1050,7 +1126,7 @@ module.exports = function(obj) {
 	return output
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1354,7 +1430,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 
 module.exports = function HashLocation(window) {
@@ -1404,7 +1480,7 @@ function getNeedToDecode() {
 	return !/x x/.test(a.hash)
 }
 
-},{"events":15}],17:[function(require,module,exports){
+},{"events":16}],18:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
 var qs = require('querystring')
 var xtend = require('xtend')
@@ -1512,7 +1588,7 @@ function setDefault(routes, defaultFn) {
 function isHashLocation(hashLocation) {
 	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
 }
-},{"./hash-location.js":16,"array.prototype.find":13,"path-to-regexp-with-reversible-keys":22,"querystring":27,"xtend":31}],18:[function(require,module,exports){
+},{"./hash-location.js":17,"array.prototype.find":14,"path-to-regexp-with-reversible-keys":24,"querystring":30,"xtend":35}],19:[function(require,module,exports){
 "use strict";
 
 module.exports = function flatten(ary) {
@@ -1525,7 +1601,7 @@ module.exports = function flatten(ary) {
 	}
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -1534,12 +1610,96 @@ module.exports = function flatten(ary) {
 !function(t,n,e){n[t]=n[t]||e(),"undefined"!=typeof module&&module.exports?module.exports=n[t]:"function"==typeof define&&define.amd&&define(function(){return n[t]})}("Promise","undefined"!=typeof global?global:this,function(){"use strict";function t(t,n){l.add(t,n),h||(h=y(l.drain))}function n(t){var n,e=typeof t;return null==t||"object"!=e&&"function"!=e||(n=t.then),"function"==typeof n?n:!1}function e(){for(var t=0;t<this.chain.length;t++)o(this,1===this.state?this.chain[t].success:this.chain[t].failure,this.chain[t]);this.chain.length=0}function o(t,e,o){var r,i;try{e===!1?o.reject(t.msg):(r=e===!0?t.msg:e.call(void 0,t.msg),r===o.promise?o.reject(TypeError("Promise-chain cycle")):(i=n(r))?i.call(r,o.resolve,o.reject):o.resolve(r))}catch(c){o.reject(c)}}function r(o){var c,u=this;if(!u.triggered){u.triggered=!0,u.def&&(u=u.def);try{(c=n(o))?t(function(){var t=new f(u);try{c.call(o,function(){r.apply(t,arguments)},function(){i.apply(t,arguments)})}catch(n){i.call(t,n)}}):(u.msg=o,u.state=1,u.chain.length>0&&t(e,u))}catch(a){i.call(new f(u),a)}}}function i(n){var o=this;o.triggered||(o.triggered=!0,o.def&&(o=o.def),o.msg=n,o.state=2,o.chain.length>0&&t(e,o))}function c(t,n,e,o){for(var r=0;r<n.length;r++)!function(r){t.resolve(n[r]).then(function(t){e(r,t)},o)}(r)}function f(t){this.def=t,this.triggered=!1}function u(t){this.promise=t,this.state=0,this.triggered=!1,this.chain=[],this.msg=void 0}function a(n){if("function"!=typeof n)throw TypeError("Not a function");if(0!==this.__NPO__)throw TypeError("Not a promise");this.__NPO__=1;var o=new u(this);this.then=function(n,r){var i={success:"function"==typeof n?n:!0,failure:"function"==typeof r?r:!1};return i.promise=new this.constructor(function(t,n){if("function"!=typeof t||"function"!=typeof n)throw TypeError("Not a function");i.resolve=t,i.reject=n}),o.chain.push(i),0!==o.state&&t(e,o),i.promise},this["catch"]=function(t){return this.then(void 0,t)};try{n.call(void 0,function(t){r.call(o,t)},function(t){i.call(o,t)})}catch(c){i.call(o,c)}}var s,h,l,p=Object.prototype.toString,y="undefined"!=typeof setImmediate?function(t){return setImmediate(t)}:setTimeout;try{Object.defineProperty({},"x",{}),s=function(t,n,e,o){return Object.defineProperty(t,n,{value:e,writable:!0,configurable:o!==!1})}}catch(d){s=function(t,n,e){return t[n]=e,t}}l=function(){function t(t,n){this.fn=t,this.self=n,this.next=void 0}var n,e,o;return{add:function(r,i){o=new t(r,i),e?e.next=o:n=o,e=o,o=void 0},drain:function(){var t=n;for(n=e=h=void 0;t;)t.fn.call(t.self),t=t.next}}}();var g=s({},"constructor",a,!1);return a.prototype=g,s(g,"__NPO__",0,!1),s(a,"resolve",function(t){var n=this;return t&&"object"==typeof t&&1===t.__NPO__?t:new n(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");n(t)})}),s(a,"reject",function(t){return new this(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");e(t)})}),s(a,"all",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):0===t.length?n.resolve([]):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");var r=t.length,i=Array(r),f=0;c(n,t,function(t,n){i[t]=n,++f===r&&e(i)},o)})}),s(a,"race",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");c(n,t,function(t,n){e(n)},o)})}),a});
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+'use strict';
+/* eslint-disable no-unused-vars */
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (e) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],22:[function(require,module,exports){
 var parser = require('./path-parser')
-var stringifyQuerystring = require('querystring').stringify
+var stringifyQuerystring = require('query-string').stringify
 
 module.exports = function(pathStr, parameters) {
-
 	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
 	var allTokens = parsed.allTokens
 	var regex = parsed.regex
@@ -1594,7 +1754,7 @@ function getParametersWithoutMatchingToken(parameters, tokenArray) {
 	}, {})
 }
 
-},{"./path-parser":21,"querystring":27}],21:[function(require,module,exports){
+},{"./path-parser":23,"query-string":27}],23:[function(require,module,exports){
 // This file to be replaced with an official implementation maintained by
 // the page.js crew if and when that becomes an option
 
@@ -1613,7 +1773,7 @@ module.exports = function(pathString) {
 	}
 }
 
-},{"path-to-regexp-with-reversible-keys":22}],22:[function(require,module,exports){
+},{"path-to-regexp-with-reversible-keys":24}],24:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -1845,12 +2005,12 @@ function pathToRegexp (path, keys, options, allTokens) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
 }
 
-},{"isarray":23}],23:[function(require,module,exports){
+},{"isarray":25}],25:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1971,7 +2131,214 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+'use strict';
+var strictUriEncode = require('strict-uri-encode');
+var objectAssign = require('object-assign');
+
+function encoderForArrayFormat(opts) {
+	switch (opts.arrayFormat) {
+		case 'index':
+			return function (key, value, index) {
+				return value === null ? [
+					encode(key, opts),
+					'[',
+					index,
+					']'
+				].join('') : [
+					encode(key, opts),
+					'[',
+					encode(index, opts),
+					']=',
+					encode(value, opts)
+				].join('');
+			};
+
+		case 'bracket':
+			return function (key, value) {
+				return value === null ? encode(key, opts) : [
+					encode(key, opts),
+					'[]=',
+					encode(value, opts)
+				].join('');
+			};
+
+		default:
+			return function (key, value) {
+				return value === null ? encode(key, opts) : [
+					encode(key, opts),
+					'=',
+					encode(value, opts)
+				].join('');
+			};
+	}
+}
+
+function parserForArrayFormat(opts) {
+	var result;
+
+	switch (opts.arrayFormat) {
+		case 'index':
+			return function (key, value, accumulator) {
+				result = /\[(\d*)\]$/.exec(key);
+
+				key = key.replace(/\[\d*\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				}
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = {};
+				}
+
+				accumulator[key][result[1]] = value;
+			};
+
+		case 'bracket':
+			return function (key, value, accumulator) {
+				result = /(\[\])$/.exec(key);
+				key = key.replace(/\[\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				} else if (accumulator[key] === undefined) {
+					accumulator[key] = [value];
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+
+		default:
+			return function (key, value, accumulator) {
+				if (accumulator[key] === undefined) {
+					accumulator[key] = value;
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+	}
+}
+
+function encode(value, opts) {
+	if (opts.encode) {
+		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
+	}
+
+	return value;
+}
+
+function keysSorter(input) {
+	if (Array.isArray(input)) {
+		return input.sort();
+	} else if (typeof input === 'object') {
+		return keysSorter(Object.keys(input)).sort(function (a, b) {
+			return Number(a) - Number(b);
+		}).map(function (key) {
+			return input[key];
+		});
+	}
+
+	return input;
+}
+
+exports.extract = function (str) {
+	return str.split('?')[1] || '';
+};
+
+exports.parse = function (str, opts) {
+	opts = objectAssign({arrayFormat: 'none'}, opts);
+
+	var formatter = parserForArrayFormat(opts);
+
+	// Create an object with no prototype
+	// https://github.com/sindresorhus/query-string/issues/47
+	var ret = Object.create(null);
+
+	if (typeof str !== 'string') {
+		return ret;
+	}
+
+	str = str.trim().replace(/^(\?|#|&)/, '');
+
+	if (!str) {
+		return ret;
+	}
+
+	str.split('&').forEach(function (param) {
+		var parts = param.replace(/\+/g, ' ').split('=');
+		// Firefox (pre 40) decodes `%3D` to `=`
+		// https://github.com/sindresorhus/query-string/pull/37
+		var key = parts.shift();
+		var val = parts.length > 0 ? parts.join('=') : undefined;
+
+		// missing `=` should be `null`:
+		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		val = val === undefined ? null : decodeURIComponent(val);
+
+		formatter(decodeURIComponent(key), val, ret);
+	});
+
+	return Object.keys(ret).sort().reduce(function (result, key) {
+		var val = ret[key];
+		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
+			// Sort object keys, not values
+			result[key] = keysSorter(val);
+		} else {
+			result[key] = val;
+		}
+
+		return result;
+	}, Object.create(null));
+};
+
+exports.stringify = function (obj, opts) {
+	var defaults = {
+		encode: true,
+		strict: true,
+		arrayFormat: 'none'
+	};
+
+	opts = objectAssign(defaults, opts);
+
+	var formatter = encoderForArrayFormat(opts);
+
+	return obj ? Object.keys(obj).sort().map(function (key) {
+		var val = obj[key];
+
+		if (val === undefined) {
+			return '';
+		}
+
+		if (val === null) {
+			return encode(key, opts);
+		}
+
+		if (Array.isArray(val)) {
+			var result = [];
+
+			val.slice().forEach(function (val2) {
+				if (val2 === undefined) {
+					return;
+				}
+
+				result.push(formatter(key, val2, result.length));
+			});
+
+			return result.join('&');
+		}
+
+		return encode(key, opts) + '=' + encode(val, opts);
+	}).filter(function (x) {
+		return x.length > 0;
+	}).join('&') : '';
+};
+
+},{"object-assign":21,"strict-uri-encode":33}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2057,7 +2424,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2144,13 +2511,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":25,"./encode":26}],28:[function(require,module,exports){
+},{"./decode":28,"./encode":29}],31:[function(require,module,exports){
 var extend = require('xtend')
 
 function wrapWackyPromise(promise, cb) {
@@ -2301,7 +2668,7 @@ function isRactiveTemplateObject(template) {
 	return template && typeof template.v === 'number'
 }
 
-},{"xtend":31}],29:[function(require,module,exports){
+},{"xtend":35}],32:[function(require,module,exports){
 /*
 	Ractive.js v0.7.3
 	Sat Apr 25 2015 13:52:38 GMT-0400 (EDT) - commit da40f81c660ba2f09c45a09a9c20fdd34ee36d80
@@ -18922,7 +19289,15 @@ function isRactiveTemplateObject(template) {
 }));
 
 
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
+'use strict';
+module.exports = function (str) {
+	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+	});
+};
+
+},{}],34:[function(require,module,exports){
 module.exports = function denodeify(fn) {
 	return function() {
 		var self = this
@@ -18949,7 +19324,7 @@ module.exports = function denodeify(fn) {
 	}
 }
 
-},{}],31:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -18970,7 +19345,7 @@ function extend() {
     return target
 }
 
-},{}],32:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 function time(action, seconds) {
@@ -19009,4 +19384,4 @@ var ninthWeek = [warmup(5 * 60), jog(30)];
 
 module.exports = [[firstWeek, firstWeek, firstWeek], [secondWeek, secondWeek, secondWeek], [thirdWeek, thirdWeek, thirdWeek], [fourthWeek, fourthWeek, fourthWeek], [fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree], [sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree], [seventhWeek, seventhWeek, seventhWeek], [eightWeek, eightWeek, eightWeek], [ninthWeek, ninthWeek, ninthWeek]];
 
-},{}]},{},[2]);
+},{}]},{},[3]);
