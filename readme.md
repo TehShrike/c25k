@@ -35,6 +35,11 @@ Nice-to-haves:
 - fancier congratulation screen (fireworks?)
 - colors picked by someone with a better feel for these kinds of things
 
+# Todo
+
+- scroll the selection screen down to the next day on first load
+- if there is a run in progress when the selection screen is loaded, redirect to the run after the last one that was finished
+
 # Eventually
 
 If I ever make it to 5K (or someone else beats me to it), there will be a 5K-to-10K version!
