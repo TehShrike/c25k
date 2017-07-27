@@ -38,8 +38,7 @@
 				border-width: 2px;
 				border-style: solid;
 				margin: 1em;
-				padding-top: 1em;
-				padding-bottom: 1em;
+				padding: 1em .5em;
 				font-size: 1.5em;
 				text-decoration: none;
 			}
@@ -61,28 +60,26 @@
 
 		<script id='day-selection' type='text/ractive'>
 			<div class="reset">
-				{{#allPlans:weekNumber}}
-				<div>
-					<div class="horizontal-container">
-					{{#.:dayNumber}}
-						<a
-						class="day-button black hover-border-teal
-						{{model.getDay(weekNumber, dayNumber) ? 'bg-lime' : 'bg-aqua'}}
-						{{isNextDay(weekNumber, dayNumber) ? 'border--red' : 'border--gray' }}
-						horizontal-child rounded"
-						href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
-							Week {{weekNumber + 1}} — day {{dayNumber + 1}}
-							{{#model.getDay(weekNumber, dayNumber)}}
-								<br>COMPLETED!
-								<br>{{dayName(model.getDay(weekNumber, dayNumber))}},
-								{{monthName(model.getDay(weekNumber, dayNumber))}}
-								{{model.getDay(weekNumber, dayNumber).getDate()}}
-							{{/}}
-						</a>
+				<div class="horizontal-container">
+					{{#allPlans:weekNumber}}
+						{{#.:dayNumber}}
+							<a
+							class="day-button black hover-border-teal
+							{{model.getDay(weekNumber, dayNumber) ? 'bg-lime' : 'bg-aqua'}}
+							{{isNextDay(weekNumber, dayNumber) ? 'border--red' : 'border--gray' }}
+							horizontal-child rounded"
+							href="{{makePath('timer', { week: weekNumber, day: dayNumber })}}">
+								Week {{weekNumber + 1}} — day {{dayNumber + 1}}
+								{{#model.getDay(weekNumber, dayNumber)}}
+									<br>COMPLETED!
+									<br>{{dayName(model.getDay(weekNumber, dayNumber))}},
+									{{monthName(model.getDay(weekNumber, dayNumber))}}
+									{{model.getDay(weekNumber, dayNumber).getDate()}}
+								{{/}}
+							</a>
+						{{/}}
 					{{/}}
-					</div>
 				</div>
-				{{/}}
 			</div>
 		</script>
 
