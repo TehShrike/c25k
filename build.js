@@ -28,7 +28,7 @@ function increment(_ref) {
 	return day === 2 ? { week: week + 1, day: 0 } : { week: week, day: day + 1 };
 }
 
-},{"just-flatten":19}],2:[function(require,module,exports){
+},{"just-flatten":20}],2:[function(require,module,exports){
 "use strict";
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
@@ -269,7 +269,7 @@ function debounceToNextFrame(fn) {
 
 stateRouter.evaluateCurrentRoute('day-selection');
 
-},{"./date-modification":1,"./derive-step-from-plan":2,"./model":4,"./schedule":36,"abstract-state-router":6,"ractive":32,"ractive-state-router":31}],4:[function(require,module,exports){
+},{"./date-modification":1,"./derive-step-from-plan":2,"./model":4,"./schedule":5,"abstract-state-router":7,"ractive":33,"ractive-state-router":32}],4:[function(require,module,exports){
 'use strict';
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -345,8 +345,47 @@ function setDay(_ref2) {
 }
 
 },{}],5:[function(require,module,exports){
-module.exports = { reverse: false }
+'use strict';
+
+function time(action, seconds) {
+	return { action: action, seconds: seconds };
+}
+function walk(seconds) {
+	return time('walk', seconds);
+}
+function jog(seconds) {
+	return time('jog', seconds);
+}
+function warmup(seconds) {
+	return time('warmup', seconds);
+}
+function cooldown(seconds) {
+	return time('cooldown', seconds);
+}
+
+var firstWeek = [warmup(5 * 60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), cooldown(5 * 60)];
+var secondWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), cooldown(4 * 60)];
+var thirdWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), cooldown(5 * 60)];
+var fourthWeek = [warmup(5 * 60), jog(5 * 60), walk(90), jog(5 * 60), walk(150), jog(3 * 60), walk(90), jog(5 * 60), cooldown(3 * 60 + 30)];
+var fifthWeekDayOne = [warmup(5 * 60), jog(5 * 60), walk(3 * 60), jog(5 * 60), walk(3 * 60), jog(5 * 60), cooldown(4 * 60)];
+var fifthWeekDayTwo = [warmup(5 * 60), jog(8 * 60), walk(5 * 60), jog(8 * 60), cooldown(4 * 60)];
+var fifthWeekDayThree = [warmup(5 * 60), jog(20 * 60), cooldown(5 * 60)];
+
+var sixthWeekDayOne = [warmup(5 * 60), jog(5 * 60), walk(3 * 60), jog(8 * 60), walk(3 * 60), jog(5 * 60), cooldown(4 * 60)];
+var sixthWeekDayTwo = [warmup(5 * 60), jog(10 * 60), walk(3 * 60), jog(10 * 60), cooldown(4 * 60)];
+var sixthWeekDayThree = [warmup(5 * 60), jog(22 * 60), cooldown(5 * 60)];
+
+var seventhWeek = [warmup(5 * 60), jog(25)];
+
+var eightWeek = [warmup(5 * 60), jog(28)];
+
+var ninthWeek = [warmup(5 * 60), jog(30)];
+
+module.exports = [[firstWeek, firstWeek, firstWeek], [secondWeek, secondWeek, secondWeek], [thirdWeek, thirdWeek, thirdWeek], [fourthWeek, fourthWeek, fourthWeek], [fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree], [sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree], [seventhWeek, seventhWeek, seventhWeek], [eightWeek, eightWeek, eightWeek], [ninthWeek, ninthWeek, ninthWeek]];
+
 },{}],6:[function(require,module,exports){
+module.exports = { reverse: false }
+},{}],7:[function(require,module,exports){
 (function (process){
 var StateState = require('./lib/state-state')
 var StateComparison = require('./lib/state-comparison')
@@ -777,7 +816,7 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./default-router-options.js":5,"./lib/current-state":7,"./lib/promise-map-series":8,"./lib/state-change-logic":9,"./lib/state-comparison":10,"./lib/state-state":11,"./lib/state-string-parser":12,"./lib/state-transition-manager":13,"_process":26,"combine-arrays":15,"events":16,"hash-brown-router":18,"native-promise-only/npo":20,"page-path-builder":22,"then-denodeify":34,"xtend":35}],7:[function(require,module,exports){
+},{"./default-router-options.js":6,"./lib/current-state":8,"./lib/promise-map-series":9,"./lib/state-change-logic":10,"./lib/state-comparison":11,"./lib/state-state":12,"./lib/state-string-parser":13,"./lib/state-transition-manager":14,"_process":27,"combine-arrays":16,"events":17,"hash-brown-router":19,"native-promise-only/npo":21,"page-path-builder":23,"then-denodeify":35,"xtend":36}],8:[function(require,module,exports){
 module.exports = function CurrentState() {
 	var current = {
 		name: '',
@@ -797,7 +836,7 @@ module.exports = function CurrentState() {
 	}
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // Pulled from https://github.com/joliss/promise-map-series and prettied up a bit
 
 var Promise = require('native-promise-only/npo')
@@ -815,7 +854,7 @@ module.exports = function sequence(array, iterator, thisArg) {
 	return Promise.all(results)
 }
 
-},{"native-promise-only/npo":20}],9:[function(require,module,exports){
+},{"native-promise-only/npo":21}],10:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -846,7 +885,7 @@ module.exports = function stateChangeLogic(stateComparisonResults) {
 	return output
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var combine = require('combine-arrays')
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
@@ -903,7 +942,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":12,"combine-arrays":15,"path-to-regexp-with-reversible-keys":24}],11:[function(require,module,exports){
+},{"./state-string-parser":13,"combine-arrays":16,"path-to-regexp-with-reversible-keys":25}],12:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -993,7 +1032,7 @@ module.exports = function StateState() {
 	}
 }
 
-},{"./state-string-parser":12}],12:[function(require,module,exports){
+},{"./state-string-parser":13}],13:[function(require,module,exports){
 module.exports = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
 		if (stateNames.length) {
@@ -1004,7 +1043,7 @@ module.exports = function(stateString) {
 	}, [])
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = function (emitter) {
 	var currentTransitionAttempt = null
 	var nextTransition = null
@@ -1059,7 +1098,7 @@ module.exports = function (emitter) {
 	}
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1094,7 +1133,7 @@ module.exports = function (emitter) {
   }
 })(this);
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 module.exports = function(obj) {
 	var keys = Object.keys(obj)
 
@@ -1126,7 +1165,7 @@ module.exports = function(obj) {
 	return output
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1430,7 +1469,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 
 module.exports = function HashLocation(window) {
@@ -1480,7 +1519,7 @@ function getNeedToDecode() {
 	return !/x x/.test(a.hash)
 }
 
-},{"events":16}],18:[function(require,module,exports){
+},{"events":17}],19:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
 var qs = require('querystring')
 var xtend = require('xtend')
@@ -1588,7 +1627,7 @@ function setDefault(routes, defaultFn) {
 function isHashLocation(hashLocation) {
 	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
 }
-},{"./hash-location.js":17,"array.prototype.find":14,"path-to-regexp-with-reversible-keys":24,"querystring":30,"xtend":35}],19:[function(require,module,exports){
+},{"./hash-location.js":18,"array.prototype.find":15,"path-to-regexp-with-reversible-keys":25,"querystring":31,"xtend":36}],20:[function(require,module,exports){
 "use strict";
 
 module.exports = function flatten(ary) {
@@ -1601,7 +1640,7 @@ module.exports = function flatten(ary) {
 	}
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (global){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -1610,7 +1649,7 @@ module.exports = function flatten(ary) {
 !function(t,n,e){n[t]=n[t]||e(),"undefined"!=typeof module&&module.exports?module.exports=n[t]:"function"==typeof define&&define.amd&&define(function(){return n[t]})}("Promise","undefined"!=typeof global?global:this,function(){"use strict";function t(t,n){l.add(t,n),h||(h=y(l.drain))}function n(t){var n,e=typeof t;return null==t||"object"!=e&&"function"!=e||(n=t.then),"function"==typeof n?n:!1}function e(){for(var t=0;t<this.chain.length;t++)o(this,1===this.state?this.chain[t].success:this.chain[t].failure,this.chain[t]);this.chain.length=0}function o(t,e,o){var r,i;try{e===!1?o.reject(t.msg):(r=e===!0?t.msg:e.call(void 0,t.msg),r===o.promise?o.reject(TypeError("Promise-chain cycle")):(i=n(r))?i.call(r,o.resolve,o.reject):o.resolve(r))}catch(c){o.reject(c)}}function r(o){var c,u=this;if(!u.triggered){u.triggered=!0,u.def&&(u=u.def);try{(c=n(o))?t(function(){var t=new f(u);try{c.call(o,function(){r.apply(t,arguments)},function(){i.apply(t,arguments)})}catch(n){i.call(t,n)}}):(u.msg=o,u.state=1,u.chain.length>0&&t(e,u))}catch(a){i.call(new f(u),a)}}}function i(n){var o=this;o.triggered||(o.triggered=!0,o.def&&(o=o.def),o.msg=n,o.state=2,o.chain.length>0&&t(e,o))}function c(t,n,e,o){for(var r=0;r<n.length;r++)!function(r){t.resolve(n[r]).then(function(t){e(r,t)},o)}(r)}function f(t){this.def=t,this.triggered=!1}function u(t){this.promise=t,this.state=0,this.triggered=!1,this.chain=[],this.msg=void 0}function a(n){if("function"!=typeof n)throw TypeError("Not a function");if(0!==this.__NPO__)throw TypeError("Not a promise");this.__NPO__=1;var o=new u(this);this.then=function(n,r){var i={success:"function"==typeof n?n:!0,failure:"function"==typeof r?r:!1};return i.promise=new this.constructor(function(t,n){if("function"!=typeof t||"function"!=typeof n)throw TypeError("Not a function");i.resolve=t,i.reject=n}),o.chain.push(i),0!==o.state&&t(e,o),i.promise},this["catch"]=function(t){return this.then(void 0,t)};try{n.call(void 0,function(t){r.call(o,t)},function(t){i.call(o,t)})}catch(c){i.call(o,c)}}var s,h,l,p=Object.prototype.toString,y="undefined"!=typeof setImmediate?function(t){return setImmediate(t)}:setTimeout;try{Object.defineProperty({},"x",{}),s=function(t,n,e,o){return Object.defineProperty(t,n,{value:e,writable:!0,configurable:o!==!1})}}catch(d){s=function(t,n,e){return t[n]=e,t}}l=function(){function t(t,n){this.fn=t,this.self=n,this.next=void 0}var n,e,o;return{add:function(r,i){o=new t(r,i),e?e.next=o:n=o,e=o,o=void 0},drain:function(){var t=n;for(n=e=h=void 0;t;)t.fn.call(t.self),t=t.next}}}();var g=s({},"constructor",a,!1);return a.prototype=g,s(g,"__NPO__",0,!1),s(a,"resolve",function(t){var n=this;return t&&"object"==typeof t&&1===t.__NPO__?t:new n(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");n(t)})}),s(a,"reject",function(t){return new this(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");e(t)})}),s(a,"all",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):0===t.length?n.resolve([]):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");var r=t.length,i=Array(r),f=0;c(n,t,function(t,n){i[t]=n,++f===r&&e(i)},o)})}),s(a,"race",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");c(n,t,function(t,n){e(n)},o)})}),a});
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 /* eslint-disable no-unused-vars */
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -1695,7 +1734,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var parser = require('./path-parser')
 var stringifyQuerystring = require('query-string').stringify
 
@@ -1754,7 +1793,7 @@ function getParametersWithoutMatchingToken(parameters, tokenArray) {
 	}, {})
 }
 
-},{"./path-parser":23,"query-string":27}],23:[function(require,module,exports){
+},{"./path-parser":24,"query-string":28}],24:[function(require,module,exports){
 // This file to be replaced with an official implementation maintained by
 // the page.js crew if and when that becomes an option
 
@@ -1773,7 +1812,7 @@ module.exports = function(pathString) {
 	}
 }
 
-},{"path-to-regexp-with-reversible-keys":24}],24:[function(require,module,exports){
+},{"path-to-regexp-with-reversible-keys":25}],25:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -2005,12 +2044,12 @@ function pathToRegexp (path, keys, options, allTokens) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
 }
 
-},{"isarray":25}],25:[function(require,module,exports){
+},{"isarray":26}],26:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -2131,7 +2170,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 var strictUriEncode = require('strict-uri-encode');
 var objectAssign = require('object-assign');
@@ -2338,7 +2377,7 @@ exports.stringify = function (obj, opts) {
 	}).join('&') : '';
 };
 
-},{"object-assign":21,"strict-uri-encode":33}],28:[function(require,module,exports){
+},{"object-assign":22,"strict-uri-encode":34}],29:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2424,7 +2463,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2511,13 +2550,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":28,"./encode":29}],31:[function(require,module,exports){
+},{"./decode":29,"./encode":30}],32:[function(require,module,exports){
 var extend = require('xtend')
 
 function wrapWackyPromise(promise, cb) {
@@ -2668,7 +2707,7 @@ function isRactiveTemplateObject(template) {
 	return template && typeof template.v === 'number'
 }
 
-},{"xtend":35}],32:[function(require,module,exports){
+},{"xtend":36}],33:[function(require,module,exports){
 /*
 	Ractive.js v0.7.3
 	Sat Apr 25 2015 13:52:38 GMT-0400 (EDT) - commit da40f81c660ba2f09c45a09a9c20fdd34ee36d80
@@ -19289,7 +19328,7 @@ function isRactiveTemplateObject(template) {
 }));
 
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
@@ -19297,7 +19336,7 @@ module.exports = function (str) {
 	});
 };
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 module.exports = function denodeify(fn) {
 	return function() {
 		var self = this
@@ -19324,7 +19363,7 @@ module.exports = function denodeify(fn) {
 	}
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -19344,44 +19383,5 @@ function extend() {
 
     return target
 }
-
-},{}],36:[function(require,module,exports){
-'use strict';
-
-function time(action, seconds) {
-	return { action: action, seconds: seconds };
-}
-function walk(seconds) {
-	return time('walk', seconds);
-}
-function jog(seconds) {
-	return time('jog', seconds);
-}
-function warmup(seconds) {
-	return time('warmup', seconds);
-}
-function cooldown(seconds) {
-	return time('cooldown', seconds);
-}
-
-var firstWeek = [warmup(5 * 60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), cooldown(5 * 60)];
-var secondWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), cooldown(4 * 60)];
-var thirdWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), cooldown(5 * 60)];
-var fourthWeek = [warmup(5 * 60), jog(5 * 60), walk(90), jog(5 * 60), walk(150), jog(3 * 60), walk(90), jog(5 * 60), cooldown(3 * 60 + 30)];
-var fifthWeekDayOne = [warmup(5 * 60), jog(5 * 60), walk(3 * 60), jog(5 * 60), walk(3 * 60), jog(5 * 60), cooldown(4 * 60)];
-var fifthWeekDayTwo = [warmup(5 * 60), jog(8 * 60), walk(5 * 60), jog(8 * 60), cooldown(4 * 60)];
-var fifthWeekDayThree = [warmup(5 * 60), jog(20 * 60), cooldown(5 * 60)];
-
-var sixthWeekDayOne = [warmup(5 * 60), jog(5 * 60), walk(3 * 60), jog(8 * 60), walk(3 * 60), jog(5 * 60), cooldown(4 * 60)];
-var sixthWeekDayTwo = [warmup(5 * 60), jog(10 * 60), walk(3 * 60), jog(10 * 60), cooldown(4 * 60)];
-var sixthWeekDayThree = [warmup(5 * 60), jog(22 * 60), cooldown(5 * 60)];
-
-var seventhWeek = [warmup(5 * 60), jog(25)];
-
-var eightWeek = [warmup(5 * 60), jog(28)];
-
-var ninthWeek = [warmup(5 * 60), jog(30)];
-
-module.exports = [[firstWeek, firstWeek, firstWeek], [secondWeek, secondWeek, secondWeek], [thirdWeek, thirdWeek, thirdWeek], [fourthWeek, fourthWeek, fourthWeek], [fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree], [sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree], [seventhWeek, seventhWeek, seventhWeek], [eightWeek, eightWeek, eightWeek], [ninthWeek, ninthWeek, ninthWeek]];
 
 },{}]},{},[3]);
