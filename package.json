@@ -8,9 +8,9 @@
     "url": "https://github.com/TehShrike/c25k.git"
   },
   "scripts": {
-    "test": "tape test.js",
-    "watch": "watchify index.js -t [ babelify --presets=es2015 ] -o build.js -d",
-    "build": "browserify index.js -t [ babelify --presets=es2015 ] -o build.js"
+    "test": "tape js/test.js",
+    "watch": "watchify js/index.js -t [ babelify --presets=es2015 ] -o build.js -d",
+    "build": "browserify js/index.js -t [ babelify --presets=es2015 ] -o build.js"
   },
   "keywords": [],
   "author": "",
