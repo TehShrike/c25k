@@ -1,12 +1,10 @@
 Functional couch-to-5k direction-giving app.
 
-Pick the current day in the schedule, then follow the on-screen directions.
+Pick the current day in the schedule, then do what the computer says.
 
 When you finish a jog, or hit the "done" button, it will remember that in localstorage.
 
-# To use the current version
-
-Go to https://tehshrike.github.io/c25k/
+Use the current version at https://tehshrike.github.io/c25k/
 
 # To develop locally
 
@@ -19,16 +17,12 @@ npm run build
 
 # Features that aren't implemented but you can open pull requests that I will merge
 
-I set my phone on the treadmill in front of me, so I operate entirely off of visual cues.  To go running outside, you'll probably want:
+I set my phone on the treadmill in front of me, so I operate entirely off of visual cues.  To go running outside, you'll probably want audio cues when steps change.
 
-- audio cues when steps change
-- an option to disable the "keep the screen alive" functionality
-
-Other things that could be necessary eventually:
+Other things that someone might want eventually:
 
 - better feedback as to how many days ago you completed the last run
 - maybe some kind of calendar to show your progress over time and whether or not you're getting the week's worth of runs done in a week
-- some kind of modification of history - maybe if you go back to an earlier date, the days after that one are colored differently (even though you've technically completed them before) so that you can still tell visually which day would be next after your most recent jog
 
 Nice-to-haves:
 
@@ -37,6 +31,7 @@ Nice-to-haves:
 
 # Todo
 
+- try to get nosleep code working on iOS
 - scroll the selection screen down to the next day on first load
 - if there is a run in progress when the selection screen is loaded, redirect to the run after the last one that was finished
 
