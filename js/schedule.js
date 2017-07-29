@@ -96,17 +96,17 @@ const sixthWeekDayThree = [
 
 const seventhWeek = [
 	warmup(5 * 60),
-	jog(25)
+	jog(25 * 60)
 ]
 
 const eightWeek = [
 	warmup(5 * 60),
-	jog(28)
+	jog(28 * 60)
 ]
 
 const ninthWeek = [
 	warmup(5 * 60),
-	jog(30)
+	jog(30 * 60)
 ]
 
 module.exports = [
