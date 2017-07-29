@@ -347,39 +347,42 @@ function setDay(_ref2) {
 },{}],5:[function(require,module,exports){
 'use strict';
 
-function time(action, seconds) {
+var time = function time(action, seconds) {
 	return { action: action, seconds: seconds };
-}
-function walk(seconds) {
+};
+var walk = function walk(seconds) {
 	return time('walk', seconds);
-}
-function jog(seconds) {
+};
+var jog = function jog(seconds) {
 	return time('jog', seconds);
-}
-function warmup(seconds) {
+};
+var warmup = function warmup(seconds) {
 	return time('warmup', seconds);
-}
-function cooldown(seconds) {
+};
+var cooldown = function cooldown(seconds) {
 	return time('cooldown', seconds);
-}
+};
+var minutes = function minutes(m) {
+	return m * 60;
+};
 
-var firstWeek = [warmup(5 * 60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), jog(60), walk(60), cooldown(5 * 60)];
-var secondWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), jog(90), walk(120), cooldown(4 * 60)];
-var thirdWeek = [warmup(5 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), jog(90), walk(120), jog(90), walk(120), jog(3 * 60), walk(3 * 60), jog(3 * 60), walk(3 * 60), cooldown(5 * 60)];
-var fourthWeek = [warmup(5 * 60), jog(5 * 60), walk(90), jog(5 * 60), walk(150), jog(3 * 60), walk(90), jog(5 * 60), cooldown(3 * 60 + 30)];
-var fifthWeekDayOne = [warmup(5 * 60), jog(5 * 60), walk(3 * 60), jog(5 * 60), walk(3 * 60), jog(5 * 60), cooldown(4 * 60)];
-var fifthWeekDayTwo = [warmup(5 * 60), jog(8 * 60), walk(5 * 60), jog(8 * 60), cooldown(4 * 60)];
-var fifthWeekDayThree = [warmup(5 * 60), jog(20 * 60), cooldown(5 * 60)];
+var firstWeek = [warmup(minutes(5)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), jog(minutes(1)), walk(minutes(1)), cooldown(minutes(5))];
+var secondWeek = [warmup(minutes(5)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), cooldown(minutes(4))];
+var thirdWeek = [warmup(minutes(5)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), jog(minutes(3)), walk(minutes(3)), jog(minutes(3)), walk(minutes(3)), jog(90), walk(minutes(2)), jog(90), walk(minutes(2)), jog(minutes(3)), walk(minutes(3)), jog(minutes(3)), walk(minutes(3)), cooldown(minutes(5))];
+var fourthWeek = [warmup(minutes(5)), jog(minutes(5)), walk(90), jog(minutes(5)), walk(150), jog(minutes(3)), walk(90), jog(minutes(5)), cooldown(3 * 60 + 30)];
+var fifthWeekDayOne = [warmup(minutes(5)), jog(minutes(5)), walk(minutes(3)), jog(minutes(5)), walk(minutes(3)), jog(minutes(5)), cooldown(minutes(4))];
+var fifthWeekDayTwo = [warmup(minutes(5)), jog(minutes(8)), walk(minutes(5)), jog(minutes(8)), cooldown(minutes(4))];
+var fifthWeekDayThree = [warmup(minutes(5)), jog(minutes(20)), cooldown(minutes(5))];
 
-var sixthWeekDayOne = [warmup(5 * 60), jog(5 * 60), walk(3 * 60), jog(8 * 60), walk(3 * 60), jog(5 * 60), cooldown(4 * 60)];
-var sixthWeekDayTwo = [warmup(5 * 60), jog(10 * 60), walk(3 * 60), jog(10 * 60), cooldown(4 * 60)];
-var sixthWeekDayThree = [warmup(5 * 60), jog(22 * 60), cooldown(5 * 60)];
+var sixthWeekDayOne = [warmup(minutes(5)), jog(minutes(5)), walk(minutes(3)), jog(minutes(8)), walk(minutes(3)), jog(minutes(5)), cooldown(minutes(4))];
+var sixthWeekDayTwo = [warmup(minutes(5)), jog(minutes(10)), walk(minutes(3)), jog(minutes(10)), cooldown(minutes(4))];
+var sixthWeekDayThree = [warmup(minutes(5)), jog(minutes(22)), cooldown(minutes(5))];
 
-var seventhWeek = [warmup(5 * 60), jog(25)];
+var seventhWeek = [warmup(minutes(5)), jog(minutes(25))];
 
-var eightWeek = [warmup(5 * 60), jog(28)];
+var eightWeek = [warmup(minutes(5)), jog(minutes(28))];
 
-var ninthWeek = [warmup(5 * 60), jog(30)];
+var ninthWeek = [warmup(minutes(5)), jog(minutes(30))];
 
 module.exports = [[firstWeek, firstWeek, firstWeek], [secondWeek, secondWeek, secondWeek], [thirdWeek, thirdWeek, thirdWeek], [fourthWeek, fourthWeek, fourthWeek], [fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree], [sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree], [seventhWeek, seventhWeek, seventhWeek], [eightWeek, eightWeek, eightWeek], [ninthWeek, ninthWeek, ninthWeek]];
 
