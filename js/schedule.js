@@ -1,112 +1,103 @@
-function time(action, seconds) {
-	return { action, seconds }
-}
-function walk(seconds) {
-	return time('walk', seconds)
-}
-function jog(seconds) {
-	return time('jog', seconds)
-}
-function warmup(seconds) {
-	return time('warmup', seconds)
-}
-function cooldown(seconds) {
-	return time('cooldown', seconds)
-}
+const time = (action, seconds) => ({ action, seconds })
+const walk = (seconds) => time('walk', seconds)
+const jog = (seconds) => time('jog', seconds)
+const warmup = (seconds) => time('warmup', seconds)
+const cooldown = (seconds) => time('cooldown', seconds)
+const minutes = m => m * 60
 
 const firstWeek = [
-	warmup(5 * 60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	jog(60), walk(60),
-	cooldown(5 * 60)
+	warmup(minutes(5)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	jog(minutes(1)), walk(minutes(1)),
+	cooldown(minutes(5))
 ]
 const secondWeek = [
-	warmup(5 * 60),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	cooldown(4 * 60)
+	warmup(minutes(5)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	cooldown(minutes(4))
 ]
 const thirdWeek = [
-	warmup(5 * 60),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	jog(3 * 60), walk(3 * 60),
-	jog(3 * 60), walk(3 * 60),
-	jog(90), walk(120),
-	jog(90), walk(120),
-	jog(3 * 60), walk(3 * 60),
-	jog(3 * 60), walk(3 * 60),
-	cooldown(5 * 60)
+	warmup(minutes(5)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	jog(minutes(3)), walk(minutes(3)),
+	jog(minutes(3)), walk(minutes(3)),
+	jog(90), walk(minutes(2)),
+	jog(90), walk(minutes(2)),
+	jog(minutes(3)), walk(minutes(3)),
+	jog(minutes(3)), walk(minutes(3)),
+	cooldown(minutes(5))
 ]
 const fourthWeek = [
-	warmup(5 * 60),
-	jog(5 * 60), walk(90),
-	jog(5 * 60), walk(150),
-	jog(3 * 60), walk(90),
-	jog(5 * 60),
+	warmup(minutes(5)),
+	jog(minutes(5)), walk(90),
+	jog(minutes(5)), walk(150),
+	jog(minutes(3)), walk(90),
+	jog(minutes(5)),
 	cooldown(3 * 60 + 30)
 ]
 const fifthWeekDayOne = [
-	warmup(5 * 60),
-	jog(5 * 60), walk(3 * 60),
-	jog(5 * 60), walk(3 * 60),
-	jog(5 * 60),
-	cooldown(4 * 60)
+	warmup(minutes(5)),
+	jog(minutes(5)), walk(minutes(3)),
+	jog(minutes(5)), walk(minutes(3)),
+	jog(minutes(5)),
+	cooldown(minutes(4))
 ]
 const fifthWeekDayTwo = [
-	warmup(5 * 60),
-	jog(8 * 60), walk(5 * 60),
-	jog(8 * 60),
-	cooldown(4 * 60)
+	warmup(minutes(5)),
+	jog(minutes(8)), walk(minutes(5)),
+	jog(minutes(8)),
+	cooldown(minutes(4))
 ]
 const fifthWeekDayThree = [
-	warmup(5 * 60),
-	jog(20 * 60),
-	cooldown(5 * 60)
+	warmup(minutes(5)),
+	jog(minutes(20)),
+	cooldown(minutes(5))
 ]
 
 const sixthWeekDayOne = [
-	warmup(5 * 60),
-	jog(5 * 60), walk(3 * 60),
-	jog(8 * 60), walk(3 * 60),
-	jog(5 * 60),
-	cooldown(4 * 60)
+	warmup(minutes(5)),
+	jog(minutes(5)), walk(minutes(3)),
+	jog(minutes(8)), walk(minutes(3)),
+	jog(minutes(5)),
+	cooldown(minutes(4))
 ]
 const sixthWeekDayTwo = [
-	warmup(5 * 60),
-	jog(10 * 60), walk(3 * 60),
-	jog(10 * 60),
-	cooldown(4 * 60)
+	warmup(minutes(5)),
+	jog(minutes(10)), walk(minutes(3)),
+	jog(minutes(10)),
+	cooldown(minutes(4))
 ]
 const sixthWeekDayThree = [
-	warmup(5 * 60),
-	jog(22 * 60),
-	cooldown(5 * 60)
+	warmup(minutes(5)),
+	jog(minutes(22)),
+	cooldown(minutes(5))
 ]
 
 const seventhWeek = [
-	warmup(5 * 60),
-	jog(25 * 60)
+	warmup(minutes(5)),
+	jog(minutes(25))
 ]
 
 const eightWeek = [
-	warmup(5 * 60),
-	jog(28 * 60)
+	warmup(minutes(5)),
+	jog(minutes(28))
 ]
 
 const ninthWeek = [
-	warmup(5 * 60),
-	jog(30 * 60)
+	warmup(minutes(5)),
+	jog(minutes(30))
 ]
 
 module.exports = [
