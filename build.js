@@ -378,11 +378,11 @@ var sixthWeekDayOne = [warmup(minutes(5)), jog(minutes(5)), walk(minutes(3)), jo
 var sixthWeekDayTwo = [warmup(minutes(5)), jog(minutes(10)), walk(minutes(3)), jog(minutes(10)), cooldown(minutes(4))];
 var sixthWeekDayThree = [warmup(minutes(5)), jog(minutes(22)), cooldown(minutes(5))];
 
-var seventhWeek = [warmup(minutes(5)), jog(minutes(25))];
+var seventhWeek = [warmup(minutes(5)), jog(minutes(25)), cooldown(minutes(5))];
 
-var eightWeek = [warmup(minutes(5)), jog(minutes(28))];
+var eightWeek = [warmup(minutes(5)), jog(minutes(28)), cooldown(minutes(5))];
 
-var ninthWeek = [warmup(minutes(5)), jog(minutes(30))];
+var ninthWeek = [warmup(minutes(5)), jog(minutes(30)), cooldown(minutes(5))];
 
 module.exports = [[firstWeek, firstWeek, firstWeek], [secondWeek, secondWeek, secondWeek], [thirdWeek, thirdWeek, thirdWeek], [fourthWeek, fourthWeek, fourthWeek], [fifthWeekDayOne, fifthWeekDayTwo, fifthWeekDayThree], [sixthWeekDayOne, sixthWeekDayTwo, sixthWeekDayThree], [seventhWeek, seventhWeek, seventhWeek], [eightWeek, eightWeek, eightWeek], [ninthWeek, ninthWeek, ninthWeek]];
 
